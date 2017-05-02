@@ -81,6 +81,7 @@ public class ExtensionLoader<T> {
 
     private final ExtensionFactory objectFactory;
 
+    //<JettyContainer, jetty>的缓存
     private final ConcurrentMap<Class<?>, String> cachedNames = new ConcurrentHashMap<Class<?>, String>();
     
     private final Holder<Map<String, Class<?>>> cachedClasses = new Holder<Map<String,Class<?>>>();
@@ -586,20 +587,35 @@ public class ExtensionLoader<T> {
                 if(names.length == 1) cachedDefaultName = names[0];
             }
         }
-        
+        /**
+         * <jetty, JettyContainer>
+         */
         Map<String, Class<?>> extensionClasses = new HashMap<String, Class<?>>();
+        //从下面的三个目录查找SPI的扩展点
         loadFile(extensionClasses, DUBBO_INTERNAL_DIRECTORY);
         loadFile(extensionClasses, DUBBO_DIRECTORY);
         loadFile(extensionClasses, SERVICES_DIRECTORY);
         return extensionClasses;
     }
-    
+
+    /**
+     * 这个方法还是很长，感觉抽象层次上不是很清楚，和Spring的代码比较下就高下立现了
+     * @param extensionClasses
+     * @param dir
+     */
     private void loadFile(Map<String, Class<?>> extensionClasses, String dir) {
+        /*
+            type，===》Container, 参见dubbo-container-jetty下面的resources目录中的
+            META-INF.dubbo.internal =====> dir
+            com.alibaba.dubbo.container.Container =====> type.getName()
+         */
+
         String fileName = dir + type.getName();
         try {
             Enumeration<java.net.URL> urls;
             ClassLoader classLoader = findClassLoader();
             if (classLoader != null) {
+                //getResources会返回所有指定位置的资源，包括不同jar包相同目录的资源
                 urls = classLoader.getResources(fileName);
             } else {
                 urls = ClassLoader.getSystemResources(fileName);
@@ -620,16 +636,20 @@ public class ExtensionLoader<T> {
                                         String name = null;
                                         int i = line.indexOf('=');
                                         if (i > 0) {
+                                            // jetty
                                             name = line.substring(0, i).trim();
+                                            // com.alibaba.dubbo.container.jetty.JettyContainer
                                             line = line.substring(i + 1).trim();
                                         }
                                         if (line.length() > 0) {
+                                            //利用反射加载对应的扩展类
                                             Class<?> clazz = Class.forName(line, true, classLoader);
                                             if (! type.isAssignableFrom(clazz)) {
                                                 throw new IllegalStateException("Error when load extension class(interface: " +
                                                         type + ", class line: " + clazz.getName() + "), class " 
                                                         + clazz.getName() + "is not subtype of interface.");
                                             }
+                                            //TODO: adaptive注解,
                                             if (clazz.isAnnotationPresent(Adaptive.class)) {
                                                 if(cachedAdaptiveClass == null) {
                                                     cachedAdaptiveClass = clazz;
@@ -662,6 +682,7 @@ public class ExtensionLoader<T> {
                                                     }
                                                     String[] names = NAME_SEPARATOR.split(name);
                                                     if (names != null && names.length > 0) {
+                                                        //TODO, Activatea注解
                                                         Activate activate = clazz.getAnnotation(Activate.class);
                                                         if (activate != null) {
                                                             cachedActivates.put(names[0], activate);

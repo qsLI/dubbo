@@ -56,7 +56,8 @@ public class Main {
                 containers.add(loader.getExtension(args[i]));
             }
             logger.info("Use container type(" + Arrays.toString(args) + ") to run dubbo serivce.");
-            
+
+            //应该可以抽出来成为一个函数
             if ("true".equals(System.getProperty(SHUTDOWN_HOOK_KEY))) {
 	            Runtime.getRuntime().addShutdownHook(new Thread() {
 	                public void run() {
