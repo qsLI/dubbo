@@ -62,6 +62,7 @@ public class ReferenceBean<T> extends ReferenceConfig<T> implements FactoryBean,
 	}
     
     public Object getObject() throws Exception {
+	    //Factory-Bean，可以将复杂的初始化逻辑由代码来控制，委托给了父类来创建
         return get();
     }
 

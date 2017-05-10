@@ -82,6 +82,10 @@ public class DubboBeanDefinitionParser implements BeanDefinitionParser {
         RootBeanDefinition beanDefinition = new RootBeanDefinition();
         beanDefinition.setBeanClass(beanClass);
         beanDefinition.setLazyInit(false);
+        /**
+         * 生成bean的id，
+         * =======================================================>>>>>>
+         */
         String id = element.getAttribute("id");
         if ((id == null || id.length() == 0) && required) {
         	String generatedBeanName = element.getAttribute("name");
@@ -108,6 +112,9 @@ public class DubboBeanDefinitionParser implements BeanDefinitionParser {
             parserContext.getRegistry().registerBeanDefinition(id, beanDefinition);
             beanDefinition.getPropertyValues().addPropertyValue("id", id);
         }
+        /**
+         * =======================================================>>>>>>
+         */
         if (ProtocolConfig.class.equals(beanClass)) {
             for (String name : parserContext.getRegistry().getBeanDefinitionNames()) {
                 BeanDefinition definition = parserContext.getRegistry().getBeanDefinition(name);
@@ -133,6 +140,11 @@ public class DubboBeanDefinitionParser implements BeanDefinitionParser {
         } else if (ConsumerConfig.class.equals(beanClass)) {
             parseNested(element, parserContext, ReferenceBean.class, false, "reference", "consumer", id, beanDefinition);
         }
+
+        /**
+         * 解析属性，
+         * =======================================================>>>>>>
+         */
         Set<String> props = new HashSet<String>();
         ManagedMap parameters = null;
         for (Method setter : beanClass.getMethods()) {
@@ -164,6 +176,7 @@ public class DubboBeanDefinitionParser implements BeanDefinitionParser {
                 } else if ("arguments".equals(property)) {
                     parseArguments(id, element.getChildNodes(), beanDefinition, parserContext);
                 } else {
+                    //从标签中解析出对应的值，并设置到相应的属性中
                     String value = element.getAttribute(property);
                     if (value != null) {
                     	value = value.trim();
@@ -235,6 +248,10 @@ public class DubboBeanDefinitionParser implements BeanDefinitionParser {
                 }
             }
         }
+        /**
+         * =======================================================>>>>>>
+         * 额外的属性
+         */
         NamedNodeMap attributes = element.getAttributes();
         int len = attributes.getLength();
         for (int i = 0; i < len; i++) {
@@ -251,6 +268,10 @@ public class DubboBeanDefinitionParser implements BeanDefinitionParser {
         if (parameters != null) {
             beanDefinition.getPropertyValues().addPropertyValue("parameters", parameters);
         }
+        /**
+         * =======================================================>>>>>>
+         */
+
         return beanDefinition;
     }
 

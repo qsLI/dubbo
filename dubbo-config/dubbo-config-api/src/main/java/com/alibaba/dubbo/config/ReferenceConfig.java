@@ -175,6 +175,7 @@ public class ReferenceConfig<T> extends AbstractReferenceConfig {
             interfaceClass = GenericService.class;
         } else {
             try {
+                //创建接口对象
 				interfaceClass = Class.forName(interfaceName, true, Thread.currentThread()
 				        .getContextClassLoader());
 			} catch (ClassNotFoundException e) {

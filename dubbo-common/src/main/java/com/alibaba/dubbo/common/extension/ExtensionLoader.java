@@ -575,6 +575,7 @@ public class ExtensionLoader<T> {
 
     // 此方法已经getExtensionClasses方法同步过。
     private Map<String, Class<?>> loadExtensionClasses() {
+        //接口上的SPI中的值来指定默认的接口实现，对于Container是spring, 只能指定一个默认的实现
         final SPI defaultAnnotation = type.getAnnotation(SPI.class);
         if(defaultAnnotation != null) {
             String value = defaultAnnotation.value();
@@ -660,6 +661,7 @@ public class ExtensionLoader<T> {
                                                 }
                                             } else {
                                                 try {
+                                                    //装饰者模式，会对传进来的type进行包装，wrapperClasses
                                                     clazz.getConstructor(type);
                                                     Set<Class<?>> wrappers = cachedWrapperClasses;
                                                     if (wrappers == null) {
@@ -668,6 +670,7 @@ public class ExtensionLoader<T> {
                                                     }
                                                     wrappers.add(clazz);
                                                 } catch (NoSuchMethodException e) {
+                                                    //被包装的类
                                                     clazz.getConstructor();
                                                     if (name == null || name.length() == 0) {
                                                         name = findAnnotationName(clazz);
@@ -682,7 +685,7 @@ public class ExtensionLoader<T> {
                                                     }
                                                     String[] names = NAME_SEPARATOR.split(name);
                                                     if (names != null && names.length > 0) {
-                                                        //TODO, Activatea注解
+                                                        //Activate注解,是否可以自动加载
                                                         Activate activate = clazz.getAnnotation(Activate.class);
                                                         if (activate != null) {
                                                             cachedActivates.put(names[0], activate);
