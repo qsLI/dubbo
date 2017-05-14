@@ -30,6 +30,10 @@ import com.alibaba.dubbo.rpc.service.EchoService;
 public abstract class AbstractProxyFactory implements ProxyFactory {
 
     public <T> T getProxy(Invoker<T> invoker) throws RpcException {
+
+        /**
+         * ============================多个接口的情况
+         */
         Class<?>[] interfaces = null;
         String config = invoker.getUrl().getParameter("interfaces");
         if (config != null && config.length() > 0) {
@@ -39,11 +43,16 @@ public abstract class AbstractProxyFactory implements ProxyFactory {
                 interfaces[0] = invoker.getInterface();
                 interfaces[1] = EchoService.class;
                 for (int i = 0; i < types.length; i ++) {
+                    //从echoService开始覆盖，会不会出现重复的情况？
                     interfaces[i + 1] = ReflectUtils.forName(types[i]);
                 }
             }
         }
+        /**
+         * ============================单个接口的情况
+         */
         if (interfaces == null) {
+            //e.g. com.alibaba.dubbo.demo.DemoService
             interfaces = new Class<?>[] {invoker.getInterface(), EchoService.class};
         }
         return getProxy(invoker, interfaces);

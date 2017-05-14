@@ -24,6 +24,7 @@ import com.alibaba.dubbo.common.Node;
  * @see com.alibaba.dubbo.rpc.InvokerListener
  * @see com.alibaba.dubbo.rpc.protocol.AbstractInvoker
  * @author william.liangf
+ * 这个接口没有用SPI指定默认值，应该是跟协议有关联的，由不同的协议返回不同的Invoker
  */
 public interface Invoker<T> extends Node {
 

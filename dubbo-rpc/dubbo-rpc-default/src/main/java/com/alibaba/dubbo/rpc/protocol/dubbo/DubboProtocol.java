@@ -231,6 +231,7 @@ public class DubboProtocol extends AbstractProtocol {
         URL url = invoker.getUrl();
         
         // export service.
+        // eg. com.alibaba.dubbo.demo.DemoService:20880
         String key = serviceKey(url);
         DubboExporter<T> exporter = new DubboExporter<T>(invoker, key, exporterMap);
         exporterMap.put(key, exporter);
@@ -257,8 +258,13 @@ public class DubboProtocol extends AbstractProtocol {
     
     private void openServer(URL url) {
         // find server.
+        //eg. 192.168.0.111:20880
         String key = url.getAddress();
         //client 也可以暴露一个只有server可以调用的服务。
+        //url eg
+        /**
+         * dubbo://192.168.0.111:20880/com.alibaba.dubbo.demo.DemoService?anyhost=true&application=demo-provider&dubbo=2.0.0&generic=false&interface=com.alibaba.dubbo.demo.DemoService&loadbalance=roundrobin&methods=sayHello&owner=william&pid=17930&side=provider&timestamp=1494670828757
+         */
         boolean isServer = url.getParameter(Constants.IS_SERVER_KEY,true);
         if (isServer) {
         	ExchangeServer server = serverMap.get(key);
@@ -284,6 +290,8 @@ public class DubboProtocol extends AbstractProtocol {
         url = url.addParameter(Constants.CODEC_KEY, Version.isCompatibleVersion() ? COMPATIBLE_CODEC_NAME : DubboCodec.NAME);
         ExchangeServer server;
         try {
+            //注意，这里开始bind指定的接口了！！！
+            //Exchangers是dubbo-remoting里面的，涉及到通信相关的
             server = Exchangers.bind(url, requestHandler);
         } catch (RemotingException e) {
             throw new RpcException("Fail to start server(url: " + url + ") " + e.getMessage(), e);
@@ -298,6 +306,14 @@ public class DubboProtocol extends AbstractProtocol {
         return server;
     }
 
+    /**
+     *
+     * @param serviceType 接口类，e.g. interface com.alibaba.dubbo.demo.DemoService
+     * @param url 远程服务的URL地址
+     * @param <T>
+     * @return
+     * @throws RpcException
+     */
     public <T> Invoker<T> refer(Class<T> serviceType, URL url) throws RpcException {
         // create rpc invoker.
         DubboInvoker<T> invoker = new DubboInvoker<T>(serviceType, url, getClients(url), invokers);
@@ -318,6 +334,7 @@ public class DubboProtocol extends AbstractProtocol {
         ExchangeClient[] clients = new ExchangeClient[connections];
         for (int i = 0; i < clients.length; i++) {
             if (service_share_connect){
+                //共享连接的线程池？？？
                 clients[i] = getSharedClient(url);
             } else {
                 clients[i] = initClient(url);

@@ -93,6 +93,7 @@ public class DubboBeanDefinitionParser implements BeanDefinitionParser {
         	    if (ProtocolConfig.class.equals(beanClass)) {
         	        generatedBeanName = "dubbo";
         	    } else {
+        	        //ReferenceBean 是一个factoryBean，id是interface的值，getObject返回的是接口类型
         	        generatedBeanName = element.getAttribute("interface");
         	    }
         	}

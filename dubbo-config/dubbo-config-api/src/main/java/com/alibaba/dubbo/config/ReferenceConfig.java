@@ -183,6 +183,10 @@ public class ReferenceConfig<T> extends AbstractReferenceConfig {
 			}
             checkInterfaceAndMethods(interfaceClass, methods);
         }
+        /**
+         * dubbo.resolve.file 或者配置文件，可以设置直连， 方便测试
+         * @see: http://dubbo.io/Directly+Provider-zh.htm
+         */
         String resolve = System.getProperty(interfaceName);
         String resolveFile = null;
         if (resolve == null || resolve.length() == 0) {
@@ -221,6 +225,9 @@ public class ReferenceConfig<T> extends AbstractReferenceConfig {
         		}
     		}
         }
+        /**
+         * =============================================|dubbo 配置文件或者java环境变量>
+         */
         if (consumer != null) {
             if (application == null) {
                 application = consumer.getApplication();
@@ -298,6 +305,15 @@ public class ReferenceConfig<T> extends AbstractReferenceConfig {
         }
         //attributes通过系统context进行存储.
         StaticContext.getSystemContext().putAll(attributes);
+        /**
+         * 0 = {HashMap$Node@3324} "side" -> "consumer"
+         1 = {HashMap$Node@3457} "application" -> "demo-consumer"
+         2 = {HashMap$Node@3428} "methods" -> "sayHello"
+         3 = {HashMap$Node@3333} "dubbo" -> "2.0.0"
+         4 = {HashMap$Node@3367} "pid" -> "24452"
+         5 = {HashMap$Node@3440} "interface" -> "com.alibaba.dubbo.demo.DemoService"
+         6 = {HashMap$Node@3342} "timestamp" -> "1494756106604"
+         */
         ref = createProxy(map);
     }
     
@@ -424,6 +440,7 @@ public class ReferenceConfig<T> extends AbstractReferenceConfig {
             logger.info("Refer dubbo service " + interfaceClass.getName() + " from url " + invoker.getUrl());
         }
         // 创建服务代理
+        //相应的invoker动态代理成接口类
         return (T) proxyFactory.getProxy(invoker);
     }
 

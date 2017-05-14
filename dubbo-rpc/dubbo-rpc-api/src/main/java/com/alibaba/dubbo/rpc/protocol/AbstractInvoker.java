@@ -49,6 +49,9 @@ public abstract class AbstractInvoker<T> implements Invoker<T> {
 
     private final URL        url;
 
+    /**
+     * Constants.INTERFACE_KEY, Constants.GROUP_KEY, Constants.TOKEN_KEY, Constants.TIMEOUT_KEY
+     */
     private final Map<String, String> attachment;
 
     private volatile boolean available = true;
@@ -119,6 +122,12 @@ public abstract class AbstractInvoker<T> implements Invoker<T> {
         return getInterface() + " -> " + (getUrl() == null ? "" : getUrl().toString());
     }
 
+    /**
+     * Invoker的入口方法
+     * @param inv
+     * @return
+     * @throws RpcException
+     */
     public Result invoke(Invocation inv) throws RpcException {
         if(destroyed) {
             throw new RpcException("Rpc invoker for service " + this + " on consumer " + NetUtils.getLocalHost() 
@@ -134,13 +143,16 @@ public abstract class AbstractInvoker<T> implements Invoker<T> {
         if (context != null) {
         	invocation.addAttachmentsIfAbsent(context);
         }
+        //异步dubbo
         if (getUrl().getMethodParameter(invocation.getMethodName(), Constants.ASYNC_KEY, false)){
         	invocation.setAttachment(Constants.ASYNC_KEY, Boolean.TRUE.toString());
         }
+        //attachment中put一个调用id
         RpcUtils.attachInvocationIdIfAsync(getUrl(), invocation);
         
         
         try {
+            //模板方法
             return doInvoke(invocation);
         } catch (InvocationTargetException e) { // biz exception
             Throwable te = e.getTargetException();
