@@ -60,6 +60,9 @@ public class NettyServer extends AbstractServer implements Server {
     private org.jboss.netty.channel.Channel channel;
 
     public NettyServer(URL url, ChannelHandler handler) throws RemotingException{
+        /**
+         * 线程池名称， e.g. DubboServerHandler-10.90.7.19:20800-thread-32
+         */
         super(url, ChannelHandlers.wrap(handler, ExecutorUtil.setThreadName(url, SERVER_THREAD_POOL_NAME)));
     }
 

@@ -495,6 +495,11 @@ public class ExtensionLoader<T> {
         return new IllegalStateException(buf.toString());
     }
 
+    /**
+     * 这个地方返回了wrapper
+     * @param name
+     * @return
+     */
     @SuppressWarnings("unchecked")
     private T createExtension(String name) {
         Class<?> clazz = getExtensionClasses().get(name);
@@ -511,6 +516,7 @@ public class ExtensionLoader<T> {
             Set<Class<?>> wrapperClasses = cachedWrapperClasses;
             if (wrapperClasses != null && wrapperClasses.size() > 0) {
                 for (Class<?> wrapperClass : wrapperClasses) {
+                    //如果有多个wrapper，就搞成了链式的了，一层包装一层， Filter和Listener在此构造
                     instance = injectExtension((T) wrapperClass.getConstructor(type).newInstance(instance));
                 }
             }
@@ -531,9 +537,9 @@ public class ExtensionLoader<T> {
                         Class<?> pt = method.getParameterTypes()[0];
                         try {
                             String property = method.getName().length() > 3 ? method.getName().substring(3, 4).toLowerCase() + method.getName().substring(4) : "";
-                            Object object = objectFactory.getExtension(pt, property);
+                            Object object = objectFactory.getExtension(pt, property); //加载相应的属性
                             if (object != null) {
-                                method.invoke(instance, object);
+                                method.invoke(instance, object); //调用set方法 instance.setXXX(object)
                             }
                         } catch (Exception e) {
                             logger.error("fail to inject via method " + method.getName()
@@ -547,7 +553,12 @@ public class ExtensionLoader<T> {
         }
         return instance;
     }
-    
+
+    /**
+     * (interface com.alibaba.dubbo.rpc.cluster.LoadBalance, <roundrobin,class com.alibaba.dubbo.rpc.cluster.loadbalance.RoundRobinLoadBalance>)
+     * @param name
+     * @return
+     */
 	private Class<?> getExtensionClass(String name) {
 	    if (type == null)
 	        throw new IllegalArgumentException("Extension type == null");
@@ -661,7 +672,11 @@ public class ExtensionLoader<T> {
                                                 }
                                             } else {
                                                 try {
-                                                    //装饰者模式，会对传进来的type进行包装，wrapperClasses
+                                                    /**
+                                                     * 装饰者模式，会对传进来的type进行包装，wrapperClasses
+                                                     * 比如Protocol ==》 如果这个类有以Protocol为参数的构造函数，那么clazz就是wrapper类， ProtocolFilterWrapper
+                                                     *  public ProtocolFilterWrapper(Protocol protocol){
+                                                     */
                                                     clazz.getConstructor(type);
                                                     Set<Class<?>> wrappers = cachedWrapperClasses;
                                                     if (wrappers == null) {

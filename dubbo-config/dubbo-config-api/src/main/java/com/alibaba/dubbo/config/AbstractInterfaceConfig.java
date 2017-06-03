@@ -157,6 +157,9 @@ public abstract class AbstractInterfaceConfig extends AbstractMethodConfig {
     
     protected List<URL> loadRegistries(boolean provider) {
         checkRegistry();
+        /**
+         * e.g. <dubbo:registry address="multicast://224.5.6.7:1234" />
+         */
         List<URL> registryList = new ArrayList<URL>();
         if (registries != null && registries.size() > 0) {
             for (RegistryConfig config : registries) {
@@ -186,6 +189,9 @@ public abstract class AbstractInterfaceConfig extends AbstractMethodConfig {
                             map.put("protocol", "dubbo");
                         }
                     }
+                    /**
+                     * e.g. multicast://224.5.6.7:1234/com.alibaba.dubbo.registry.RegistryService?application=demo-consumer&dubbo=2.0.0&pid=2950&timestamp=1494770287419
+                     */
                     List<URL> urls = UrlUtils.parseURLs(address, map);
                     for (URL url : urls) {
                         url = url.addParameter(Constants.REGISTRY_KEY, url.getProtocol());

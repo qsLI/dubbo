@@ -209,7 +209,13 @@ public abstract class AbstractClusterInvoker<T> implements Invoker<T> {
         }
         return null;
     }
-    
+
+    /**
+     * cluster invoker的入口类
+     * @param invocation
+     * @return
+     * @throws RpcException
+     */
     public Result invoke(final Invocation invocation) throws RpcException {
 
         checkWhetherDestroyed();
@@ -255,7 +261,13 @@ public abstract class AbstractClusterInvoker<T> implements Invoker<T> {
 
     protected abstract Result doInvoke(Invocation invocation, List<Invoker<T>> invokers,
                                        LoadBalance loadbalance) throws RpcException;
-    
+
+    /**
+     * 调用Directory的list方法
+     * @param invocation
+     * @return
+     * @throws RpcException
+     */
     protected  List<Invoker<T>> list(Invocation invocation) throws RpcException {
     	List<Invoker<T>> invokers = directory.list(invocation);
     	return invokers;

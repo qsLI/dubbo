@@ -118,6 +118,16 @@ public class RegistryDirectory<T> extends AbstractDirectory<T> implements Notify
         this.multiGroup = group != null && ("*".equals(group) || group.contains( "," ));
         String methods = queryMap.get(Constants.METHODS_KEY);
         this.serviceMethods = methods == null ? null : Constants.COMMA_SPLIT_PATTERN.split(methods);
+        /**
+         * e.g.
+         * 0 = {HashMap$Node@2634} "side" -> "consumer"
+         1 = {HashMap$Node@2635} "application" -> "demo-consumer"
+         2 = {HashMap$Node@2628} "methods" -> "sayHello"
+         3 = {HashMap$Node@2636} "dubbo" -> "2.0.0"
+         4 = {HashMap$Node@2637} "pid" -> "8754"
+         5 = {HashMap$Node@2638} "interface" -> "com.alibaba.dubbo.demo.DemoService"
+         6 = {HashMap$Node@2639} "timestamp" -> "1494775003489"
+         */
     }
 
     public void setProtocol(Protocol protocol) {
@@ -192,6 +202,7 @@ public class RegistryDirectory<T> extends AbstractDirectory<T> implements Notify
             }
         }
         // providers
+        //更新本地引用
         refreshInvoker(invokerUrls);
     }
     
@@ -392,6 +403,7 @@ public class RegistryDirectory<T> extends AbstractDirectory<T> implements Notify
                 		enabled = url.getParameter(Constants.ENABLED_KEY, true);
                 	}
                 	if (enabled) {
+                	    //调用相应的protocol创建invoker
                 		invoker = new InvokerDelegete<T>(protocol.refer(serviceType, url), url, providerUrl);
                 	}
                 } catch (Throwable t) {

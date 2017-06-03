@@ -36,6 +36,9 @@ import com.alibaba.dubbo.common.utils.NamedThreadFactory;
 public class FixedThreadPool implements ThreadPool {
 
     public Executor getExecutor(URL url) {
+        /**
+         * 线程池的名称
+         */
         String name = url.getParameter(Constants.THREAD_NAME_KEY, Constants.DEFAULT_THREAD_NAME);
         int threads = url.getParameter(Constants.THREADS_KEY, Constants.DEFAULT_THREADS);
         int queues = url.getParameter(Constants.QUEUES_KEY, Constants.DEFAULT_QUEUES);

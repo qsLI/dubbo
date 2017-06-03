@@ -78,6 +78,9 @@ public class DubboProtocol extends AbstractProtocol {
     
     private static final String IS_CALLBACK_SERVICE_INVOKE = "_isCallBackServiceInvoke";
 
+    /**
+     * HeaderExchangeHandler中使用的handler
+     */
     private ExchangeHandler requestHandler = new ExchangeHandlerAdapter() {
         
         public Object reply(ExchangeChannel channel, Object message) throws RemotingException {

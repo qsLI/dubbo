@@ -274,6 +274,7 @@ public class ReferenceConfig<T> extends AbstractReferenceConfig {
                 map.put("revision", revision);
             }
 
+            //todo:搞清楚wrapper类的作用
             String[] methods = Wrapper.getWrapper(interfaceClass).getMethodNames();
             if(methods.length == 0) {
                 logger.warn("NO method found in service interface " + interfaceClass.getName());
@@ -383,13 +384,18 @@ public class ReferenceConfig<T> extends AbstractReferenceConfig {
                             url = url.setPath(interfaceName);
                         }
                         if (Constants.REGISTRY_PROTOCOL.equals(url.getProtocol())) {
+                            //注册中心
                             urls.add(url.addParameterAndEncoded(Constants.REFER_KEY, StringUtils.toQueryString(map)));
                         } else {
+                            //直连
                             urls.add(ClusterUtils.mergeUrl(url, map));
                         }
                     }
                 }
             } else { // 通过注册中心配置拼装URL
+                /**
+                 * e.g. registry://224.5.6.7:1234/com.alibaba.dubbo.registry.RegistryService?application=demo-consumer&dubbo=2.0.0&pid=2950&registry=multicast&timestamp=1494770287419
+                 */
             	List<URL> us = loadRegistries(false);
             	if (us != null && us.size() > 0) {
                 	for (URL u : us) {
@@ -397,6 +403,16 @@ public class ReferenceConfig<T> extends AbstractReferenceConfig {
                         if (monitorUrl != null) {
                             map.put(Constants.MONITOR_KEY, URL.encode(monitorUrl.toFullString()));
                         }
+                        /**
+                         * e.g.
+                         * 0 = {HashMap$Node@2624} "side" -> "consumer"
+                         1 = {HashMap$Node@2625} "application" -> "demo-consumer"
+                         2 = {HashMap$Node@2626} "methods" -> "sayHello"
+                         3 = {HashMap$Node@2627} "dubbo" -> "2.0.0"
+                         4 = {HashMap$Node@2628} "pid" -> "3587"
+                         5 = {HashMap$Node@2629} "interface" -> "com.alibaba.dubbo.demo.DemoService"
+                         6 = {HashMap$Node@2630} "timestamp" -> "1494770680259"
+                         */
                 	    urls.add(u.addParameterAndEncoded(Constants.REFER_KEY, StringUtils.toQueryString(map)));
                     }
             	}

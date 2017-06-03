@@ -106,6 +106,9 @@ final class HeaderExchangeChannel implements ExchangeChannel {
         Request req = new Request();
         req.setVersion("2.0.0");
         req.setTwoWay(true);
+        /**
+         * request其实是Invocation，也可以是其他的
+         */
         req.setData(request);
         DefaultFuture future = new DefaultFuture(channel, req, timeout);
         try{
