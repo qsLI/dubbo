@@ -241,6 +241,9 @@ public class RegistryProtocol implements Protocol {
     @SuppressWarnings("unchecked")
 	public <T> Invoker<T> refer(Class<T> type, URL url) throws RpcException {
         url = url.setProtocol(url.getParameter(Constants.REGISTRY_KEY, Constants.DEFAULT_REGISTRY)).removeParameter(Constants.REGISTRY_KEY);
+        /**
+         * 根据URL中的registry类型来创建相应的registry， 比如 ZookeeperRegistry
+         */
         Registry registry = registryFactory.getRegistry(url);
         if (RegistryService.class.equals(type)) {
             //TODO: what the fuck???

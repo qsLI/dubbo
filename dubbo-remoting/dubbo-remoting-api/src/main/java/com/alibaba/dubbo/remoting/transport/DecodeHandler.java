@@ -39,6 +39,9 @@ public class DecodeHandler extends AbstractChannelHandlerDelegate {
     public void received(Channel channel, Object message) throws RemotingException {
         if (message instanceof Decodeable) {
             decode(message);
+            /**
+             * DecodeableRpcResult 在哪里处理的？ TODO
+             */
         }
 
         if (message instanceof Request) {

@@ -116,8 +116,14 @@ public class DubboProtocol extends AbstractProtocol {
         @Override
         public void received(Channel channel, Object message) throws RemotingException {
             if (message instanceof Invocation) {
+                /**
+                 * @see DecodeableRpcInvocation
+                 */
                 reply((ExchangeChannel) channel, message);
             } else {
+                /**
+                 * @see DecodeableRpcResult
+                 */
                 super.received(channel, message);
             }
         }

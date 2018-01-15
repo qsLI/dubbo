@@ -90,6 +90,9 @@ public class DubboInvoker<T> extends AbstractInvoker<T> {
                 return new RpcResult();
             } else if (isAsync) {
             	ResponseFuture future = currentClient.request(inv, timeout) ;
+                /**
+                 * 这里造成了异步retry的失效，
+                 */
                 RpcContext.getContext().setFuture(new FutureAdapter<Object>(future));
                 return new RpcResult();
             } else {

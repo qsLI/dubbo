@@ -138,6 +138,11 @@ public class DefaultFuture implements ResponseFuture {
                 lock.unlock();
             }
             if (isdone){
+                /**
+                 * 问题表现：Dubbo原生的异步回调，执行feature.get()当远程调用有值就返回，而不是当远程调用有值并且回调执行完毕再返回
+                 * @see: http://www.jianshu.com/p/1ca2026500f8
+                 * 应该不是个问题， 如果使用Future的话，肯定是异步的，逻辑本身就应该写道callBack里
+                 */
                 invokeCallback(callback);
             }
         }
@@ -306,6 +311,9 @@ public class DefaultFuture implements ResponseFuture {
     }
 
     static {
+        /**
+         * 客户端超时
+         */
         Thread th = new Thread(new RemotingInvocationTimeoutScan(), "DubboResponseTimeoutScanTimer");
         th.setDaemon(true);
         th.start();
